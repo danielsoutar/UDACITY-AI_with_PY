@@ -1,0 +1,4 @@
+Quiz: Password Generator
+Write a function called generate_password that selects three random words from the list of words word_list
+and concatenates them into a single string. Your function should not accept any arguments and should
+reference the global variable word_list to build the password.
