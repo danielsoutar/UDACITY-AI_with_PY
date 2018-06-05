@@ -101,6 +101,22 @@ def get_input_args():
     Returns:
      parse_args() -data structure that stores the command line arguments object
     """
+    # Creates Argument Parser object named parser
+    parser = argparse.ArgumentParser()
+
+    # Argument 1: dir
+    parser.add_argument('--dir', type = str, default = 'pet_images/',
+                    help = 'path to the pet image files')
+
+    # Argument 2: arch
+    parser.add_argument('--arch', type = str, default = 'vgg',
+                    help = 'CNN model architecture to use for image classification')
+
+    # Argument 3: dogfile
+    parser.add_argument('--dogfile', type = str, default = 'dognames.txt',
+                    help = 'Text file that contains all labels associated to dogs')
+
+    return parser.parse_args()
     pass
 
 
@@ -242,3 +258,4 @@ def print_results():
 # Call to main function to run the program
 if __name__ == "__main__":
     main()
+    get_input_args()
