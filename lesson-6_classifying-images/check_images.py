@@ -39,13 +39,19 @@ def main():
     # TODO: 2. Define get_input_args() function to create & retrieve command
     # line arguments
     in_arg = get_input_args()
-    """When completed this code will input the three command line arguments from the user.
-    """
+
     # TODO: 3. Define get_pet_labels() function to create pet image labels by
     # creating a dictionary with key=filename and value=file label to be used
     # to check the accuracy of the classifier function
-    answers_dic = get_pet_labels()
+    answers_dic = get_pet_labels(in_arg.dir)
 
+    print('/answers_dic has ', len(answers_dic),
+        'key-value pairs,\nBelow are 10 of them:')
+    prnt = 0
+    for key in answers_dic:
+        if prnt < 10:
+            print("%2d key: %-30s label: %-26s" % (prnt+1, key, answers_dic[key]))
+        prnt += 1
     # TODO: 4. Define classify_images() function to create the classifier
     # labels with the classifier function uisng in_arg.arch, comparing the
     # labels, and creating a dictionary of results (result_dic)
@@ -120,7 +126,7 @@ def get_input_args():
     pass
 
 
-def get_pet_labels():
+def get_pet_labels(image_dir):
     """
     Creates a dictionary of pet labels based upon the filenames of the image
     files. Reads in pet filenames and extracts the pet image labels from the
@@ -133,6 +139,26 @@ def get_pet_labels():
      petlabels_dic - Dictionary storing image filename (as key) and Pet Image
                      Labels (as value)
     """
+
+    # Retrieve the filenames from folder pet_images/
+    filename_list = listdir(image_dir)
+
+    petlabels_dic = dict()
+
+    for idx in range(0, len(filename_list), 1):
+        image_name = filename_list[idx].split("_")
+        pet_label = "" #temp label to hold pet label name
+        for word in image_name:
+            if word.isalpha():
+                pet_label += word.lower() + " "
+        pet_label = pet_label.strip()
+        if filename_list[idx] not in petlabels_dic:
+            petlabels_dic[filename_list[idx]] = pet_label
+        else:
+            print("** Warning: Key=", filename_list[idx],
+            "already exists in pet_dic with value =", petlabels_dic[filename_list[idx]])
+
+    return (petlabels_dic)
     pass
 
 
