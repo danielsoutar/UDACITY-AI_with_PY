@@ -206,11 +206,11 @@ def classify_images(images_dir, petlabel_dic, model):
         # another word and thus not really found, if truely found then add to
         # results dictionary and set match=1(yes) otherwise as match=0(no)
         if found >= 0: # if found>0, pet label found in classifier label
-            if ( (found == 0 and len(truth)==len(model_label)) or
-                 (  ( (found == 0) or (model_label[found-1] == ' ') )  and
-                    ( (found + len(truth) == len(model_label)) or
-                        (model_label[found + len(truth): found+len(truth)+1] in
-                         (',',' ') )
+            if ((found == 0 and len(truth)==len(model_label)) or
+                (((found == 0) or (model_label[found-1] == ' '))  and
+                ((found + len(truth) == len(model_label)) or
+                (model_label[found + len(truth): found+len(truth)+1] in
+                (',', ' '))
                     )
                  )
                ):
@@ -225,7 +225,6 @@ def classify_images(images_dir, petlabel_dic, model):
         else:
             if key not in results_dic:
                 results_dic[key] = [truth, model_label, 0]
-
 
     return(results_dic)
     pass
