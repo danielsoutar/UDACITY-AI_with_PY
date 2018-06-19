@@ -79,7 +79,6 @@ def main():
     # TODO: 1. Define tot_time to computes overall runtime in
     # seconds & prints it in hh:mm:ss format
     tot_time = end_time - start_time
-    print("\nTotal Elapsed Runtime:", tot_time, "in seconds")
     print("\nTotal Elapsed Runtime:", str( int( (tot_time / 3600) ) ) + ":" +
           str( int(  ( (tot_time % 3600) / 60 )  ) ) + ":" +
           str( round(  ( (tot_time % 3600) % 60 ) ) ) )
@@ -162,7 +161,7 @@ def get_pet_labels(image_dir):
     pass
 
 
-def classify_images():
+def classify_images(images_dir, petlabel_dic, model):
     """
     Creates classifier labels with classifier function, compares labels, and
     creates a dictionary containing both labels and comparison of them to be
@@ -187,6 +186,24 @@ def classify_images():
                     idx 2 = 1/0 (int)   where 1 = match between pet image and
                     classifer labels and 0 = no match between labels
     """
+    results_dic = dict()
+
+    for key in petlabel_dic:
+        # runs classifier function to classify the images classifier function
+        # inputs: path + filename and model, returns model_label as classifier label
+        model_label = classifier(images_dir+key, model)
+
+        # Processes the results so they can be compaed with pet image labels
+        # set labels to lowercase and strips off whitespace
+        model_label = model_label.lower().strip()
+
+        # defines 'truth' as pet image label and tries to find it using find()
+        # string function 'found' to find it within classifier label (model_label)
+        truth = petlabel_dic[key]
+        found = model_label.find(truth)
+
+
+    return(results_dic)
     pass
 
 
