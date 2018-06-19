@@ -55,7 +55,7 @@ def main():
     # TODO: 4. Define classify_images() function to create the classifier
     # labels with the classifier function uisng in_arg.arch, comparing the
     # labels, and creating a dictionary of results (result_dic)
-    result_dic = classify_images()
+    result_dic = classify_images(in_arg.dir, answers_dic, in_arg.arch)
 
     # TODO: 5. Define adjust_results4_isadog() function to adjust the results
     # dictionary(result_dic) to determine if classifier correctly classified
@@ -201,6 +201,30 @@ def classify_images(images_dir, petlabel_dic, model):
         # string function 'found' to find it within classifier label (model_label)
         truth = petlabel_dic[key]
         found = model_label.find(truth)
+
+        # if found (0 or greater) then make sure true answer wasn't found within
+        # another word and thus not really found, if truely found then add to
+        # results dictionary and set match=1(yes) otherwise as match=0(no)
+        if found >= 0: # if found>0, pet label found in classifier label
+            if ( (found == 0 and len(truth)==len(model_label)) or
+                 (  ( (found == 0) or (model_label[found-1] == ' ') )  and
+                    ( (found + len(truth) == len(model_label)) or
+                        (model_label[found + len(truth): found+len(truth)+1] in
+                         (',',' ') )
+                    )
+                 )
+               ):
+                # found label as stand-alone term (not within label)
+                if key not in results_dic:
+                    results_dic[key] = [truth, model_label, 1]
+            # found within a word/term not a label existing on its own
+            else:
+                if key not in results_dic:
+                    results_dic[key] = [truth, model_label, 0]
+        # if not found set results dictionary with match=0 (no)
+        else:
+            if key not in results_dic:
+                results_dic[key] = [truth, model_label, 0]
 
 
     return(results_dic)
