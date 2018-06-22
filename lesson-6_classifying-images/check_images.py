@@ -45,13 +45,6 @@ def main():
     # to check the accuracy of the classifier function
     answers_dic = get_pet_labels(in_arg.dir)
 
-    print('/answers_dic has ', len(answers_dic),
-        'key-value pairs,\nBelow are 10 of them:')
-    prnt = 0
-    for key in answers_dic:
-        if prnt < 10:
-            print("%2d key: %-30s label: %-26s" % (prnt+1, key, answers_dic[key]))
-        prnt += 1
     # TODO: 4. Define classify_images() function to create the classifier
     # labels with the classifier function uisng in_arg.arch, comparing the
     # labels, and creating a dictionary of results (result_dic)
@@ -61,12 +54,12 @@ def main():
     # dictionary(result_dic) to determine if classifier correctly classified
     # images as 'a dog' or 'not a dog'. This demonstrates if the model can
     # correctly classify dog images as dogs (regardless of breed)
-    adjust_results4_isadog()
+    adjust_results4_isadog(result_dic, in_arg.dogfile)
 
     # TODO: 6. Define calculates_results_stats() function to calculate
     # results of run and puts statistics in a results statistics
     # dictionary (results_stats_dic)
-    results_stats_dic = calculates_results_stats()
+    results_stats_dic = calculates_results_stats(result_dic)
 
     # TODO: 7. Define print_results() function to print summary results,
     # incorrect classifications of dogs and breeds if requested.
@@ -206,11 +199,11 @@ def classify_images(images_dir, petlabel_dic, model):
         # another word and thus not really found, if truely found then add to
         # results dictionary and set match=1(yes) otherwise as match=0(no)
         if found >= 0: # if found>0, pet label found in classifier label
-            if ((found == 0 and len(truth)==len(model_label)) or
-                (((found == 0) or (model_label[found-1] == ' '))  and
-                ((found + len(truth) == len(model_label)) or
-                (model_label[found + len(truth): found+len(truth)+1] in
-                (',', ' '))
+            if ( (found == 0 and len(truth)==len(model_label)) or
+                 (  ( (found == 0) or (model_label[found-1] == ' ') )  and
+                    ( (found + len(truth) == len(model_label)) or
+                        (model_label[found + len(truth): found+len(truth)+1] in
+                         (',',' ') )
                     )
                  )
                ):
@@ -226,11 +219,12 @@ def classify_images(images_dir, petlabel_dic, model):
             if key not in results_dic:
                 results_dic[key] = [truth, model_label, 0]
 
+
     return(results_dic)
     pass
 
 
-def adjust_results4_isadog():
+def adjust_results4_isadog(results_dic, dogsfile):
     """
     Adjusts the results dictionary to determine if classifier correctly
     classified images 'as a dog' or 'not a dog' especially when not a match.
@@ -258,10 +252,33 @@ def adjust_results4_isadog():
     Returns:
            None - results_dic is mutable data type so no return needed.
     """
+
+    dognames_dic = dict() # dictionary holds all dognames in dogsfile
+    with open(dogsfile, "r") as infile: #opens dogsfile
+        line = infile.readline() # read first line
+        while line != "": # while line isn't empty
+            line = line.rstrip() # strip newline from line
+            if line not in dognames_dic: # if dog name doesn't already exist in dict
+                dognames_dic[line] = 1 # add line to dictionary
+            else: # otherwise there's a warning message of duplicate
+                print ("**Warning: Duplicate dognames", line)
+            line = infile.readline() # reads in the next line to see if it is empty for while-loop to stop
+    for key in results_dic: # go through results_dic dictionary
+        if results_dic[key][0] in dognames_dic: # if the pet image label is found in dognames_dic
+            if results_dic[key][1] in dognames_dic: # if the classifier label is found in dognames_dic (is a dog)
+                results_dic[key].extend((1, 1)) # appends (1, 1) because both labels are dogs
+            else:
+                results_dic[key].extend((1, 0)) # appends (1, 0) because only pet label is a dog
+        else: # pet image label not found in dognames_dic
+            if results_dic[key][1] in dognames_dic: # if the classifier label is found in dognames_dic (is a dog)
+                results_dic[key].extend((0, 1)) # appends (0, 1) because both labels are dogs
+            else:
+                results_dic[key].extend((0, 0)) # appends (0, 0) because none are dogs
+
     pass
 
 
-def calculates_results_stats():
+def calculates_results_stats(results_dic):
     """
     Calculates statistics of the results of the run using classifier's model
     architecture on classifying images. Then puts the results statistics in a
@@ -324,4 +341,3 @@ def print_results():
 # Call to main function to run the program
 if __name__ == "__main__":
     main()
-    get_input_args()
