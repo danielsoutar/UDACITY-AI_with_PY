@@ -72,9 +72,9 @@ def main():
     # TODO: 1. Define tot_time to computes overall runtime in
     # seconds & prints it in hh:mm:ss format
     tot_time = end_time - start_time
-    print("\nTotal Elapsed Runtime:", str( int( (tot_time / 3600) ) ) + ":" +
-          str( int(  ( (tot_time % 3600) / 60 )  ) ) + ":" +
-          str( round(  ( (tot_time % 3600) % 60 ) ) ) )
+    print("\nTotal Elapsed Runtime:", str(int((tot_time / 3600))) + ":" +
+          str(int(((tot_time % 3600) / 60))) + ":" +
+          str(round(((tot_time % 3600) % 60))))
 
 
 # TODO: 2.-to-7. Define all the function below. Notice that the input
@@ -103,20 +103,17 @@ def get_input_args():
     parser = argparse.ArgumentParser()
 
     # Argument 1: dir
-    parser.add_argument('--dir', type = str, default = 'pet_images/',
-                    help = 'path to the pet image files')
+    parser.add_argument('--dir', type=str, default='pet_images/',
+                        help='path to the pet image files')
 
     # Argument 2: arch
-    parser.add_argument('--arch', type = str, default = 'vgg',
-                    help = 'CNN model architecture to use for image classification')
+    parser.add_argument('--arch', type=str, default='vgg',
+                        help='CNN model architecture to use for image classification')
 
     # Argument 3: dogfile
-    parser.add_argument('--dogfile', type = str, default = 'dognames.txt',
-                    help = 'Text file that contains all labels associated to dogs')
-
+    parser.add_argument('--dogfile', type=str, default='dognames.txt',
+                        help='Text file that contains all labels associated to dogs')
     return parser.parse_args()
-    pass
-
 
 def get_pet_labels(image_dir):
     """
@@ -148,11 +145,8 @@ def get_pet_labels(image_dir):
             petlabels_dic[filename_list[idx]] = pet_label
         else:
             print("** Warning: Key=", filename_list[idx],
-            "already exists in pet_dic with value =", petlabels_dic[filename_list[idx]])
-
-    return (petlabels_dic)
-    pass
-
+                  "already exists in pet_dic with value =", petlabels_dic[filename_list[idx]])
+    return petlabels_dic
 
 def classify_images(images_dir, petlabel_dic, model):
     """
@@ -199,14 +193,14 @@ def classify_images(images_dir, petlabel_dic, model):
         # another word and thus not really found, if truely found then add to
         # results dictionary and set match=1(yes) otherwise as match=0(no)
         if found >= 0: # if found>0, pet label found in classifier label
-            if ( (found == 0 and len(truth)==len(model_label)) or
-                 (  ( (found == 0) or (model_label[found-1] == ' ') )  and
-                    ( (found + len(truth) == len(model_label)) or
-                        (model_label[found + len(truth): found+len(truth)+1] in
-                         (',',' ') )
-                    )
+            if  ((found == 0 and len(truth) == len(model_label)) or
+                 (((found == 0) or (model_label[found-1] == ' '))  and
+                  ((found + len(truth) == len(model_label)) or
+                   (model_label[found + len(truth): found+len(truth)+1] in
+                    (',', ' '))
+                  )
                  )
-               ):
+                ):
                 # found label as stand-alone term (not within label)
                 if key not in results_dic:
                     results_dic[key] = [truth, model_label, 1]
@@ -219,10 +213,7 @@ def classify_images(images_dir, petlabel_dic, model):
             if key not in results_dic:
                 results_dic[key] = [truth, model_label, 0]
 
-
-    return(results_dic)
-    pass
-
+    return results_dic
 
 def adjust_results4_isadog(results_dic, dogsfile):
     """
@@ -261,22 +252,21 @@ def adjust_results4_isadog(results_dic, dogsfile):
             if line not in dognames_dic: # if dog name doesn't already exist in dict
                 dognames_dic[line] = 1 # add line to dictionary
             else: # otherwise there's a warning message of duplicate
-                print ("**Warning: Duplicate dognames", line)
-            line = infile.readline() # reads in the next line to see if it is empty for while-loop to stop
+                print("**Warning: Duplicate dognames", line)
+            line = infile.readline() # reads in the next line to see if it is empty
     for key in results_dic: # go through results_dic dictionary
         if results_dic[key][0] in dognames_dic: # if the pet image label is found in dognames_dic
-            if results_dic[key][1] in dognames_dic: # if the classifier label is found in dognames_dic (is a dog)
+            # if the classifier label is found in dognames_dic (is a dog)
+            if results_dic[key][1] in dognames_dic:
                 results_dic[key].extend((1, 1)) # appends (1, 1) because both labels are dogs
             else:
                 results_dic[key].extend((1, 0)) # appends (1, 0) because only pet label is a dog
         else: # pet image label not found in dognames_dic
-            if results_dic[key][1] in dognames_dic: # if the classifier label is found in dognames_dic (is a dog)
+            # if the classifier label is found in dognames_dic (is a dog)
+            if results_dic[key][1] in dognames_dic:
                 results_dic[key].extend((0, 1)) # appends (0, 1) because both labels are dogs
             else:
                 results_dic[key].extend((0, 0)) # appends (0, 0) because none are dogs
-
-    pass
-
 
 def calculates_results_stats(results_dic):
     """
@@ -321,35 +311,40 @@ def calculates_results_stats(results_dic):
         if results_dic[key][3] == 1: # if label is a dog
             results_stats['n_dogs_img'] += 1 # increment count of dogs
             if results_dic[key][4] == 1: # if pet image is a dog
-                results_stats['n_correct_dogs'] += 1 # increment count of correct dog classifications
+                results_stats['n_correct_dogs'] += 1 # increment correct dog classification count
 
         else: # if pet label is not a dog
             if results_dic[key][4] == 0: # if pet image is not a dog
-                results_stats['n_correct_notdogs'] += 1 # increment count of incorrect dog classifications
+                results_stats['n_correct_notdogs'] += 1 # increment incorrect dog classif. count
 
 
-    results_stats['n_images'] = len(results_dic) # calculates total images using length of results_dic
-    results_stats['n_notdogs_img'] = (results_stats['n_images'] - results_stats['n_dogs_img']) # calculates total images
+    results_stats['n_images'] = len(results_dic) # calculates total images using len(results_dic)
+
+    # calc total imgs
+    results_stats['n_notdogs_img'] = (results_stats['n_images'] - results_stats['n_dogs_img'])
+
+    # calculates % match of dog and imags
     results_stats['pct_match'] = (results_stats['n_match'] /
-                                  results_stats['n_images'])*100.0 # calculates % match of dog and images
+                                  results_stats['n_images'])*100.0
+
+    # calculates % correctly classified dogs
     results_stats['pct_correct_dogs'] = (results_stats['n_correct_dogs'] /
-                                         results_stats['n_dogs_img'])*100.0 # calculates % correctly classified dogs
-    results_stats['pct_correct_breed'] = (results_stats['n_correct_breed'] /
                                          results_stats['n_dogs_img'])*100.0
-    results_stats['pct_correct_dogs'] = (results_stats['n_correct_dogs'] /
-                                         results_stats['n_dogs_img'])*100.0 # calculates % correctly classified dogs
+    # calculates % correctly classified breeds
+    results_stats['pct_correct_breed'] = (results_stats['n_correct_breed'] /
+                                          results_stats['n_dogs_img'])*100.0
 
     if results_stats['n_notdogs_img'] > 0: # if there is more than 0 non-dog images
+        # calculates % correctly classified non-dogs
         results_stats['pct_correct_notdogs'] = (results_stats['n_correct_notdogs'] /
-                                                results_stats['n_notdogs_img'])*100.0 # calculates % correctly classified non-dogs
+                                                results_stats['n_notdogs_img'])*100.0
     else:
         results_stats['pct_correct_notdogs'] = 0.0 # if there are no non-dog images, set % to 0
 
-    return(results_stats)
-    pass
+    return results_stats
 
-
-def print_results(results_dic, results_stats, model, print_incorrect_dogs = False, print_incorrect_breed = False):
+def print_results(results_dic, results_stats, model,
+                  print_incorrect_dogs=False, print_incorrect_breed=False):
     """
     Prints summary results on the classification and then prints incorrectly
     classified dogs and incorrectly classified dog breeds if user indicates
@@ -378,10 +373,12 @@ def print_results(results_dic, results_stats, model, print_incorrect_dogs = Fals
     Returns:
            None - simply printing results.
     """
-    print("\n\n*** Results summary for CNN Model Architecture", model.upper(),"***")
+    print("\n\n*** Results summary for CNN Model Architecture", model.upper(), "***")
     print("%20s: %3d" % ("N Images", results_stats['n_images'])) # prints number of images
     print("%20s: %3d" % ("N Dog Images", results_stats['n_dogs_img'])) # prints number of dog images
-    print("%20s: %3d" % ("N Not-Dog Images", results_stats['n_notdogs_img'])) # prints number of non-dog images
+
+    # prints number of non-dog images
+    print("%20s: %3d" % ("N Not-Dog Images", results_stats['n_notdogs_img']))
 
     # prints summary statistics (%) on model run
     print(" ")
@@ -389,30 +386,31 @@ def print_results(results_dic, results_stats, model, print_incorrect_dogs = Fals
         if key[0] == "p": # if statistic keys start with 'p'
             print("%20s: %5.1f" % (key, results_stats[key])) # then print out percentages
 
-    # prints out dog misclassifications
-    if  (print_incorrect_dogs and # if print_incorrect_dogs is true AND
-         (  (results_stats['n_correct_dogs'] + results_stats['n_correct_notdogs']) # if there is dog misclassification
-            != results_stats['n_images']    )
+    # prints out dog misclassifications if print_incorrect_dogs is true AND
+    # if there is dog misclassification
+    if  (print_incorrect_dogs and
+         ((results_stats['n_correct_dogs'] + results_stats['n_correct_notdogs'])
+          != results_stats['n_images'])
         ):
         print("\nINCORRECT Dog/NOT Dog Assignments:")
-        for key in results_dic: # iterate through reuslts_dic dictionary and finds and prints misclassifications
+        # iterate through reuslts_dic dictionary and finds and prints misclassifications
+        for key in results_dic:
             if sum(results_dic[key][3:]) == 1:
                 print("Real: %-26s  Classifier: %-30s" % (results_dic[key][0],
                                                           results_dic[key][1]))
 
-    # prints out dog breed misclassifications
-    if  (print_incorrect_breed and # if print_incorrect_breed is true AND
-         (  (results_stats['n_correct_dogs'] + results_stats['n_correct_breed']) # if there is dog misclassification
-            != results_stats['n_images']    )
+    # prints out dog breed misclassifications if print_incorrect_dogs is true AND
+    # if there is dog misclassification
+    if  (print_incorrect_breed and
+         ((results_stats['n_correct_dogs'] + results_stats['n_correct_breed'])
+          != results_stats['n_images'])
         ):
         print("\nINCORRECT Dog Breed Assignments:")
-        for key in results_dic: # iterate through reuslts_dic dictionary and finds and prints misclassifications
+        # iterate through reuslts_dic dictionary and finds and prints misclassifications
+        for key in results_dic:
             if (sum(results_dic[key][3:]) == 2 and results_dic[key][2] == 0):
                 print("Real: %-26s  Classifier: %-30s" % (results_dic[key][0],
                                                           results_dic[key][1]))
-    pass
-
-
 
 # Call to main function to run the program
 if __name__ == "__main__":
