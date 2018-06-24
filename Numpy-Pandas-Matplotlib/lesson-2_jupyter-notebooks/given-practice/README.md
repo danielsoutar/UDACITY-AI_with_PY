@@ -1,0 +1,1 @@
+Part of Lesson 2: Jupyter Notebooks (part 6.Code cells), it tells me to download this notebook: *Working With Code Cells*. I've already downloaded a notebook with the same name with my own practice, so I have created this separate folder to avoid any confusions.
