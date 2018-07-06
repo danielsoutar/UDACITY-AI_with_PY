@@ -9,3 +9,6 @@ X = np.ones((4, 1))
 for c in range(2, 5):
     X = np.append(X, [[c], [c], [c], [c]], axis=1)
     c += 1
+
+
+# correct answer: X = np.ones((4,4)) * np.arange(1,5)
