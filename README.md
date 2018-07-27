@@ -1,2 +1,2 @@
 # Udacity-PY
-I'm studying Python.
+I'm studying Artificial Intelligence Programming with Python.
